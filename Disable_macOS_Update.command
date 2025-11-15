@@ -1,7 +1,7 @@
 #!/bin/bash
 clear
 
-echo "adam | 2025/11/13"
+echo "adam | 2025/11/15"
 while true; do
   tput bold ; echo -e "Enable or Disable macOS Update [On/Off] ?" ; tput sgr0
   read -r REP
@@ -22,7 +22,8 @@ done
 echo
 case $REP in
           On|on)
-
+               
+               killall "System Settings"
                tput bold ; echo "☀️ " Unlock macOS Updates ; tput sgr0
                for line in \
                     "## Lock macOS Updates Start" \
@@ -47,7 +48,30 @@ case $REP in
                     "0.0.0.0   updates.cdn-apple.com" \
                     "0.0.0.0   xp.apple.com" \
                     "0.0.0.0   gdmf.apple.com" \
-                    "## Lock macOS Updates End" 
+                    "0.0.0.0   swupdl.apple.com" \
+                    "::1   appldnld.apple.com" \
+                    "::1   gg.apple.com" \
+                    "::1   gnf-mdn.apple.com" \
+                    "::1   gnf-mr.apple.com" \
+                    "::1   gs.apple.com" \
+                    "::1   ig.apple.com" \
+                    "::1   mesu.apple.com" \
+                    "::1   ns.itunes.apple.com" \
+                    "::1   oscdn.apple.com" \
+                    "::1   osrecovery.apple.com" \
+                    "::1   skl.apple.com" \
+                    "::1   swcdn.apple.com" \
+                    "::1   swdist.apple.com" \
+                    "::1   swdownload.apple.com" \
+                    "::1   swpost.apple.com" \
+                    "::1   swquery.apple.com" \
+                    "::1   swscan.apple.com" \
+                    "::1   updates-http.cdn-apple.com" \
+                    "::1   updates.cdn-apple.com" \
+                    "::1   xp.apple.com" \
+                    "::1   gdmf.apple.com" \
+                    "::1   swupdl.apple.com" \
+                    "## Lock macOS Updates End"
                do
                # Escape dots for sed
                pattern=$(echo "$line" | sed 's/\./\\./g')
@@ -59,11 +83,17 @@ case $REP in
                sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder
                echo 1 ; echo
 
-               tput bold ; echo -e "☀️" ' Enable AppStore AutoUpdate' ; tput sgr0
+               tput bold ; echo -e "☀️" ' Enable AppStore / SoftwareUpdate' ; tput sgr0
                sudo /usr/bin/defaults write /Library/Preferences/com.apple.commerce.plist AutoUpdate -bool TRUE
-               sudo /usr/bin/defaults read /Library/Preferences/com.apple.commerce.plist AutoUpdate
-               /usr/bin/defaults write com.apple.appstored LastUpdateNotification -date "3023-12-12 12:00:00 +0000"
-               /usr/bin/defaults read com.apple.appstored LastUpdateNotification
+               sudo /usr/bin/defaults write com.apple.appstored LastUpdateNotification -date "2020-01-01 00:00:00 +0000"
+               defaults write com.apple.SoftwareUpdate MajorOSUserNotificationDate -date "2020-01-01 00:00:00 +0000"
+               defaults write com.apple.SoftwareUpdate UserNotificationDate -date "2020-01-01 00:00:00 +0000"
+               defaults write com.apple.SoftwareUpdate LastFullSuccessfulDate -date "2020-01-01 00:00:00 +0000"
+               sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist LastCollectedLoginCredentialDate -date "2020-01-01 00:00:00 +0000"
+               sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist LastSuccessfulBackgroundMSUScanDate -date "2020-01-01 00:00:00 +0000"
+               sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist LastFullSuccessfulDate -date "2020-01-01 00:00:00 +0000"
+               sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist LastCatalogChangeDate -date "2020-01-01 00:00:00 +0000"
+               sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist LastSuccessfulDate -date "2020-01-01 00:00:00 +0000"
                echo
 
                for check in AutomaticCheckEnabled AutomaticDownload ConfigDataInstall CriticalUpdateInstall
@@ -81,6 +111,7 @@ case $REP in
           ;;
           Off|off)
                
+               killall "System Settings"
                tput bold ; echo "🌙 Disable Network" ; tput sgr0
                active_services=$(networksetup -listallnetworkservices | grep -v '^\*' | grep -v disabled)
                while IFS= read -r service; do sudo  networksetup -setnetworkserviceenabled "$service" off; done <<< "$active_services"
@@ -119,6 +150,29 @@ case $REP in
                     "0.0.0.0   updates.cdn-apple.com" \
                     "0.0.0.0   xp.apple.com" \
                     "0.0.0.0   gdmf.apple.com" \
+                    "0.0.0.0   swupdl.apple.com" \
+                    "::1   appldnld.apple.com" \
+                    "::1   gg.apple.com" \
+                    "::1   gnf-mdn.apple.com" \
+                    "::1   gnf-mr.apple.com" \
+                    "::1   gs.apple.com" \
+                    "::1   ig.apple.com" \
+                    "::1   mesu.apple.com" \
+                    "::1   ns.itunes.apple.com" \
+                    "::1   oscdn.apple.com" \
+                    "::1   osrecovery.apple.com" \
+                    "::1   skl.apple.com" \
+                    "::1   swcdn.apple.com" \
+                    "::1   swdist.apple.com" \
+                    "::1   swdownload.apple.com" \
+                    "::1   swpost.apple.com" \
+                    "::1   swquery.apple.com" \
+                    "::1   swscan.apple.com" \
+                    "::1   updates-http.cdn-apple.com" \
+                    "::1   updates.cdn-apple.com" \
+                    "::1   xp.apple.com" \
+                    "::1   gdmf.apple.com" \
+                    "::1   swupdl.apple.com" \
                     "## Lock macOS Updates End"
                do
                     sudo grep -Fxq "$line" /etc/hosts || echo "$line" | sudo tee -a /etc/hosts > /dev/null
@@ -128,11 +182,17 @@ case $REP in
                echo 0 ; echo
 
 
-               tput bold ; echo "🌙 Disable AppStore AutoUpdate" ; tput sgr0
+               tput bold ; echo "🌙 Disable AppStore / SoftwareUpdate" ; tput sgr0
                sudo /usr/bin/defaults write /Library/Preferences/com.apple.commerce.plist AutoUpdate -bool FALSE
-               sudo /usr/bin/defaults read /Library/Preferences/com.apple.commerce.plist AutoUpdate
-               /usr/bin/defaults write com.apple.appstored LastUpdateNotification -date "3030-12-12 12:00:00 +0000"
-               /usr/bin/defaults read com.apple.appstored LastUpdateNotification
+               sudo /usr/bin/defaults write com.apple.appstored LastUpdateNotification -date "3030-01-01 00:00:00 +0000"
+               defaults write com.apple.SoftwareUpdate MajorOSUserNotificationDate -date "3030-01-01 00:00:00 +0000"
+               defaults write com.apple.SoftwareUpdate UserNotificationDate -date "3030-01-01 00:00:00 +0000"
+               defaults write com.apple.SoftwareUpdate LastFullSuccessfulDate -date "3030-01-01 00:00:00 +0000"
+               sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist LastCollectedLoginCredentialDate -date "3030-01-01 00:00:00 +0000"
+               sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist LastSuccessfulBackgroundMSUScanDate -date "3030-01-01 00:00:00 +0000"
+               sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist LastFullSuccessfulDate -date "3030-01-01 00:00:00 +0000"
+               sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist LastCatalogChangeDate -date "3030-01-01 00:00:00 +0000"
+               sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist LastSuccessfulDate -date "3030-01-01 00:00:00 +0000"
                echo
 
                for check in AutomaticCheckEnabled AutomaticDownload ConfigDataInstall CriticalUpdateInstall AutomaticallyInstallMacOSUpdates
