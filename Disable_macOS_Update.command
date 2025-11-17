@@ -1,7 +1,7 @@
 #!/bin/bash
 clear
 
-echo "adam | 2025/11/15"
+echo "adam | 2025/11/17"
 while true; do
   tput bold ; echo -e "Enable or Disable macOS Update [On/Off] ?" ; tput sgr0
   read -r REP
@@ -82,6 +82,8 @@ case $REP in
                # Flush DNS cache to apply changes 
                sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder
                echo 1 ; echo
+               softwareupdate -l
+               softwareupdate -l
 
                tput bold ; echo -e "☀️" ' Enable AppStore / SoftwareUpdate' ; tput sgr0
                sudo /usr/bin/defaults write /Library/Preferences/com.apple.commerce.plist AutoUpdate -bool TRUE
@@ -94,6 +96,8 @@ case $REP in
                sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist LastFullSuccessfulDate -date "2020-01-01 00:00:00 +0000"
                sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist LastCatalogChangeDate -date "2020-01-01 00:00:00 +0000"
                sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist LastSuccessfulDate -date "2020-01-01 00:00:00 +0000"
+               sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate ScheduleFrequency -int 1
+               killall NotificationCenter
                echo
 
                for check in AutomaticCheckEnabled AutomaticDownload ConfigDataInstall CriticalUpdateInstall
@@ -112,18 +116,16 @@ case $REP in
           Off|off)
                
                killall "System Settings"
-               tput bold ; echo "🌙 Disable Network" ; tput sgr0
-               active_services=$(networksetup -listallnetworkservices | grep -v '^\*' | grep -v disabled)
-               while IFS= read -r service; do sudo  networksetup -setnetworkserviceenabled "$service" off; done <<< "$active_services"
-               echo 0 ; echo
+               #tput bold ; echo "🌙 Disable Network" ; tput sgr0
+               #active_services=$(networksetup -listallnetworkservices | grep -v '^\*' | grep -v disabled)
+               #while IFS= read -r service; do sudo  networksetup -setnetworkserviceenabled "$service" off; done <<< "$active_services"
+               #echo 0 ; echo
 
                tput bold ; echo "♻️ " 'Reset Red Bubbles' ; tput sgr0
                /usr/bin/defaults write com.apple.systempreferences AttentionPrefBundleIDs 0
                /usr/bin/defaults read com.apple.systempreferences AttentionPrefBundleIDs
                /usr/bin/defaults write com.apple.appstored BadgeCount 0
                /usr/bin/defaults read com.apple.appstored BadgeCount
-               softwareupdate -l > /dev/null
-               softwareupdate -l > /dev/null
                echo
 
                tput bold ; echo "🌙 Block macOS Updates" ; tput sgr0
@@ -177,8 +179,11 @@ case $REP in
                do
                     sudo grep -Fxq "$line" /etc/hosts || echo "$line" | sudo tee -a /etc/hosts > /dev/null
                done
+               
                # Flush DNS cache to apply changes 
                sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder
+               softwareupdate -l
+               softwareupdate -l
                echo 0 ; echo
 
 
@@ -193,6 +198,8 @@ case $REP in
                sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist LastFullSuccessfulDate -date "3030-01-01 00:00:00 +0000"
                sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist LastCatalogChangeDate -date "3030-01-01 00:00:00 +0000"
                sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist LastSuccessfulDate -date "3030-01-01 00:00:00 +0000"
+               sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate ScheduleFrequency -int 0
+               killall NotificationCenter
                echo
 
                for check in AutomaticCheckEnabled AutomaticDownload ConfigDataInstall CriticalUpdateInstall AutomaticallyInstallMacOSUpdates
@@ -203,8 +210,8 @@ case $REP in
                     echo
                done
 
-               tput bold ; echo "☀️ " Enable Network ; tput sgr0
-               while IFS= read -r service; do sudo  networksetup -setnetworkserviceenabled "$service" on; done <<< "$active_services"
-               echo 1 ; echo
+               #tput bold ; echo "☀️ " Enable Network ; tput sgr0
+               #while IFS= read -r service; do sudo  networksetup -setnetworkserviceenabled "$service" on; done <<< "$active_services"
+               #echo 1 ; echo
           ;;
 esac
