@@ -1,7 +1,7 @@
 #!/bin/bash
 clear
 
-echo "adam | 2025/11/17"
+echo "adam | 2025/11/19"
 while true; do
   tput bold ; echo -e "Enable or Disable macOS Update [On/Off] ?" ; tput sgr0
   read -r REP
@@ -23,7 +23,10 @@ echo
 case $REP in
           On|on)
                
+               tput bold ; echo "🛑 Quit System Settings"; tput sgr0
                killall "System Settings"
+               echo
+
                tput bold ; echo "☀️ " Unlock macOS Updates ; tput sgr0
                for line in \
                     "## Lock macOS Updates Start" \
@@ -81,9 +84,12 @@ case $REP in
 
                # Flush DNS cache to apply changes 
                sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder
-               echo 1 ; echo
+               echo
+               
+               tput bold ; echo "♻️ " Search SoftwareUpdate ; tput sgr0
                softwareupdate -l
                softwareupdate -l
+               
 
                tput bold ; echo -e "☀️" ' Enable AppStore / SoftwareUpdate' ; tput sgr0
                sudo /usr/bin/defaults write /Library/Preferences/com.apple.commerce.plist AutoUpdate -bool TRUE
@@ -96,7 +102,6 @@ case $REP in
                sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist LastFullSuccessfulDate -date "2020-01-01 00:00:00 +0000"
                sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist LastCatalogChangeDate -date "2020-01-01 00:00:00 +0000"
                sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist LastSuccessfulDate -date "2020-01-01 00:00:00 +0000"
-               sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate ScheduleFrequency -int 1
                killall NotificationCenter
                echo
 
@@ -115,11 +120,9 @@ case $REP in
           ;;
           Off|off)
                
+               tput bold ; echo "🛑 Quit System Settings"; tput sgr0
                killall "System Settings"
-               #tput bold ; echo "🌙 Disable Network" ; tput sgr0
-               #active_services=$(networksetup -listallnetworkservices | grep -v '^\*' | grep -v disabled)
-               #while IFS= read -r service; do sudo  networksetup -setnetworkserviceenabled "$service" off; done <<< "$active_services"
-               #echo 0 ; echo
+               echo
 
                tput bold ; echo "♻️ " 'Reset Red Bubbles' ; tput sgr0
                /usr/bin/defaults write com.apple.systempreferences AttentionPrefBundleIDs 0
@@ -182,14 +185,19 @@ case $REP in
                
                # Flush DNS cache to apply changes 
                sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder
+               echo
+               
+               tput bold ; echo "♻️ " Search SoftwareUpdate ; tput sgr0
                softwareupdate -l
                softwareupdate -l
-               echo 0 ; echo
+               echo
 
 
                tput bold ; echo "🌙 Disable AppStore / SoftwareUpdate" ; tput sgr0
                sudo /usr/bin/defaults write /Library/Preferences/com.apple.commerce.plist AutoUpdate -bool FALSE
                sudo /usr/bin/defaults write com.apple.appstored LastUpdateNotification -date "3030-01-01 00:00:00 +0000"
+               defaults write com.apple.SoftwareUpdate AvailableUpdatesNotificationCountKey -int 0
+               defaults write com.apple.SoftwareUpdate AvailableUpdatesNotificationProductKey ""
                defaults write com.apple.SoftwareUpdate MajorOSUserNotificationDate -date "3030-01-01 00:00:00 +0000"
                defaults write com.apple.SoftwareUpdate UserNotificationDate -date "3030-01-01 00:00:00 +0000"
                defaults write com.apple.SoftwareUpdate LastFullSuccessfulDate -date "3030-01-01 00:00:00 +0000"
@@ -198,7 +206,14 @@ case $REP in
                sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist LastFullSuccessfulDate -date "3030-01-01 00:00:00 +0000"
                sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist LastCatalogChangeDate -date "3030-01-01 00:00:00 +0000"
                sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist LastSuccessfulDate -date "3030-01-01 00:00:00 +0000"
-               sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate ScheduleFrequency -int 0
+               sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist LastBackgroundSuccessfulDate -date "3030-01-01 00:00:00 +0000"
+               #sudo defaults delete /Library/Preferences/com.apple.SoftwareUpdate.plist FirstOfferDateDictionary
+               #sudo defaults delete /Library/Preferences/com.apple.SoftwareUpdate.plist DDMPersistedErrorKey
+               sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist FirstOfferDateDictionary ""
+               sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist LastUpdatesAvailable -int 0
+               sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist LastRecommendedUpdatesAvailable -int 0
+               sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist LastSessionSuccessful -bool TRUE
+               #sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist SkipLocalCDN -bool TRUE
                killall NotificationCenter
                echo
 
@@ -209,9 +224,9 @@ case $REP in
                     sudo /usr/bin/defaults read /Library/Preferences/com.apple.SoftwareUpdate "$check"
                     echo
                done
-
-               #tput bold ; echo "☀️ " Enable Network ; tput sgr0
-               #while IFS= read -r service; do sudo  networksetup -setnetworkserviceenabled "$service" on; done <<< "$active_services"
-               #echo 1 ; echo
+    
+               
+               ##Purge Caches ?
+               rm -fr ~/Library/Caches/*  
           ;;
 esac
