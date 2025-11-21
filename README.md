@@ -1,11 +1,11 @@
 
 ## Disable macOS Update
-#### macOS 15 Tested
+#### macOS 15 - In Testing
 
 ```
-- Block Apple Update Servers
-- Disable macOS & AppStore Updates
-- Purge Red Bubbles
+- Block Apple Update Servers in hosts
+- Disable & Lock macOS & AppStore Updates plist
+- Remove Red Bubbles
 - Can Reverse Update Back to Enable
 ```
 
