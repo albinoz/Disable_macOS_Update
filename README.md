@@ -4,7 +4,7 @@
 
 ```
 - Block Apple Update Servers in hosts
-- Disable & Lock macOS & AppStore Updates plist
+- Disable & Lock macOS / AppStore Updates plist
 - Remove Red Bubbles
 - Can Reverse Update Back to Enable
 ```
