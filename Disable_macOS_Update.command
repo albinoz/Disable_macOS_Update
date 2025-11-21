@@ -1,7 +1,34 @@
 #!/bin/bash
 clear
+#adam - 2025/11/21
 
-echo "adam | 2025/11/19"
+# Variables
+LANG=$(defaults read -g AppleLocale | cut -d'_' -f1)
+Uptime=$(system_profiler SPSoftwareDataType | grep "Time since boot:" | cut -d ':' -f2 | cut -d ' ' -f2-9)
+SytemVersion=$(system_profiler SPSoftwareDataType | grep "System Version:" | cut -d ':' -f2 | cut -d ' ' -f2-9)
+OSXMajor=$(sw_vers -productVersion | cut -d'.' -f1)
+
+# About
+echo
+tput bold ; echo "adam" ; tput sgr0
+tput bold ; echo "Disable_macOS_Update" ; tput sgr0
+
+# Infos
+echo; echo "Date:" "$(date +"%Y/%m/%d %T")"
+echo "User:" "$(hostname -s)" - "$(whoami)" - "$LANG"
+
+echo "Uptime:" "$Uptime"
+echo "Hardware:" "$(system_profiler SPHardwareDataType | grep "Model Identifier" | cut -d ':' -f2 | tr -d ' ') | $SytemVersion\
+ |$(system_profiler SPHardwareDataType | grep Memory | cut -d ':' -f2)\
+ |$(system_profiler SPHardwareDataType | grep "Number of Processors" | cut -d ':' -f2)x\
+$(system_profiler SPHardwareDataType | grep Cores | cut -d ':' -f2 | tr -d ' ') \
+$(system_profiler SPHardwareDataType | grep Speed | cut -d ':' -f2 | tr -d ' ')"
+
+# Minimum macOS
+if [ "$OSXMajor" -ge 11 ] ; then echo "$SytemVersion" Supported ; else echo "$SytemVersion" not Supported && exit ; fi
+echo
+
+# Script
 while true; do
   tput bold ; echo -e "Enable or Disable macOS Update [On/Off] ?" ; tput sgr0
   read -r REP
@@ -92,7 +119,7 @@ case $REP in
                
 
                tput bold ; echo -e "☀️" ' Enable AppStore / SoftwareUpdate' ; tput sgr0
-               sudo /usr/bin/defaults write /Library/Preferences/com.apple.commerce.plist AutoUpdate -bool TRUE
+               sudo /usr/bin/defaults write /Library/Preferences/com.apple.commerce.plist AutoUpdate -bool true
                sudo /usr/bin/defaults write com.apple.appstored LastUpdateNotification -date "2020-01-01 00:00:00 +0000"
                defaults write com.apple.SoftwareUpdate MajorOSUserNotificationDate -date "2020-01-01 00:00:00 +0000"
                defaults write com.apple.SoftwareUpdate UserNotificationDate -date "2020-01-01 00:00:00 +0000"
@@ -108,12 +135,12 @@ case $REP in
                for check in AutomaticCheckEnabled AutomaticDownload ConfigDataInstall CriticalUpdateInstall
                do
                     tput bold ; echo "☀️ " Enable "$check" ; tput sgr0
-                    sudo /usr/bin/defaults write /Library/Preferences/com.apple.SoftwareUpdate "$check" -bool TRUE
+                    sudo /usr/bin/defaults write /Library/Preferences/com.apple.SoftwareUpdate "$check" -bool true
                     sudo /usr/bin/defaults read /Library/Preferences/com.apple.SoftwareUpdate "$check"
                     echo
                done
                tput bold ; echo "🌙 Disable AutomaticallyInstallMacOSUpdates" ; tput sgr0
-               sudo /usr/bin/defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist AutomaticallyInstallMacOSUpdates -bool FALSE
+               sudo /usr/bin/defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist AutomaticallyInstallMacOSUpdates -bool false
                sudo /usr/bin/defaults read /Library/Preferences/com.apple.SoftwareUpdate.plist AutomaticallyInstallMacOSUpdates
                echo
 
@@ -192,15 +219,29 @@ case $REP in
                softwareupdate -l
                echo
 
-
                tput bold ; echo "🌙 Disable AppStore / SoftwareUpdate" ; tput sgr0
-               sudo /usr/bin/defaults write /Library/Preferences/com.apple.commerce.plist AutoUpdate -bool FALSE
+               sudo /usr/bin/defaults write /Library/Preferences/com.apple.commerce.plist AutoUpdate -bool false
                sudo /usr/bin/defaults write com.apple.appstored LastUpdateNotification -date "3030-01-01 00:00:00 +0000"
+               
+               chflags nouchg ~/Library/Preferences/com.apple.SoftwareUpdate.plist
                defaults write com.apple.SoftwareUpdate AvailableUpdatesNotificationCountKey -int 0
                defaults write com.apple.SoftwareUpdate AvailableUpdatesNotificationProductKey ""
                defaults write com.apple.SoftwareUpdate MajorOSUserNotificationDate -date "3030-01-01 00:00:00 +0000"
                defaults write com.apple.SoftwareUpdate UserNotificationDate -date "3030-01-01 00:00:00 +0000"
                defaults write com.apple.SoftwareUpdate LastFullSuccessfulDate -date "3030-01-01 00:00:00 +0000"
+               chflags uchg  ~/Library/Preferences/com.apple.SoftwareUpdate.plist
+               defaults read com.apple.SoftwareUpdate
+
+               sudo chflags nouchg /Library/Preferences/com.apple.SoftwareUpdate.plist
+               sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist AutomaticCheckEnabled -bool false
+               sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist AutomaticDownload -bool false
+               sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist ConfigDataInstall -bool false
+               sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist CriticalUpdateInstall -bool false
+               sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist AutomaticallyInstallMacOSUpdates -bool false
+               sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist AutomaticAppDownload -bool false
+               sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticallyInstallAppUpdates -bool false
+               sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticallyInstallSystemDataFiles -bool false
+               sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticallyInstallSecurityUpdates -bool false
                sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist LastCollectedLoginCredentialDate -date "3030-01-01 00:00:00 +0000"
                sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist LastSuccessfulBackgroundMSUScanDate -date "3030-01-01 00:00:00 +0000"
                sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist LastFullSuccessfulDate -date "3030-01-01 00:00:00 +0000"
@@ -209,24 +250,16 @@ case $REP in
                sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist LastBackgroundSuccessfulDate -date "3030-01-01 00:00:00 +0000"
                #sudo defaults delete /Library/Preferences/com.apple.SoftwareUpdate.plist FirstOfferDateDictionary
                #sudo defaults delete /Library/Preferences/com.apple.SoftwareUpdate.plist DDMPersistedErrorKey
+               sudo defaults delete /Library/Preferences/com.apple.SoftwareUpdate.plist RecommendedUpdates
                sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist FirstOfferDateDictionary ""
                sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist LastUpdatesAvailable -int 0
                sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist LastRecommendedUpdatesAvailable -int 0
-               sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist LastSessionSuccessful -bool TRUE
-               #sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist SkipLocalCDN -bool TRUE
-               killall NotificationCenter
-               echo
+               sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist LastSessionSuccessful -bool true
+               #sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist SkipLocalCDN -bool true
+               #sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate.plist AllowSystemRestart -bool false
+               sudo chflags uchg /Library/Preferences/com.apple.SoftwareUpdate.plist
+               defaults read /Library/Preferences/com.apple.SoftwareUpdate
 
-               for check in AutomaticCheckEnabled AutomaticDownload ConfigDataInstall CriticalUpdateInstall AutomaticallyInstallMacOSUpdates
-               do
-                    tput bold ; echo "🌙 Disable" "$check" ; tput sgr0
-                    sudo /usr/bin/defaults write /Library/Preferences/com.apple.SoftwareUpdate "$check" -bool FALSE
-                    sudo /usr/bin/defaults read /Library/Preferences/com.apple.SoftwareUpdate "$check"
-                    echo
-               done
-    
-               
-               ##Purge Caches ?
-               rm -fr ~/Library/Caches/*  
+               killall NotificationCenter
           ;;
 esac
